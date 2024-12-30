@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cl.dao.KechengchengjiDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.cl.entity.KechengchengjiEntity" id="kechengchengjiMap">
+        <result property="kechengmingcheng" column="kechengmingcheng"/>
+        <result property="kechengchengji" column="kechengchengji"/>
+        <result property="kechengxuefen" column="kechengxuefen"/>
+        <result property="xuehao" column="xuehao"/>
+        <result property="banji" column="banji"/>
+        <result property="chengjishuoming" column="chengjishuoming"/>
+        <result property="xinxibeizhu" column="xinxibeizhu"/>
+        <result property="shoukelaoshi" column="shoukelaoshi"/>
+        <result property="jiaoshigonghao" column="jiaoshigonghao"/>
+    </resultMap>
+
+    <select id="selectListView"
+		resultType="com.cl.entity.view.KechengchengjiView" >
+
+		SELECT  kechengchengji.* FROM kechengchengji  kechengchengji 	        
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectView"
+		resultType="com.cl.entity.view.KechengchengjiView" >
+		SELECT * FROM kechengchengji  kechengchengji <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+
+
+
+    <select id="selectValue" resultType="map" >
+        SELECT ${params.xColumn}, ROUND(sum(${params.yColumn}),1) total FROM kechengchengji
+        <where> 1=1 ${ew.sqlSegment}</where>
+        group by ${params.xColumn}
+        limit 10
+    </select>
+
+    <select id="selectTimeStatValue" resultType="map" >
+        <if test = 'params.timeStatType == "日"'>
+                SELECT DATE_FORMAT(${params.xColumn},'%Y-%m-%d') ${params.xColumn}, sum(${params.yColumn}) total FROM kechengchengji
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by DATE_FORMAT(${params.xColumn},'%Y-%m-%d')
+        </if>
+        <if test = 'params.timeStatType == "月"'>
+                SELECT DATE_FORMAT(${params.xColumn},'%Y-%m') ${params.xColumn}, sum(${params.yColumn}) total FROM kechengchengji
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by DATE_FORMAT(${params.xColumn},'%Y-%m')
+        </if>
+        <if test = 'params.timeStatType == "年"'>
+                SELECT DATE_FORMAT(${params.xColumn},'%Y') ${params.xColumn}, sum(${params.yColumn}) total FROM kechengchengji
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by DATE_FORMAT(${params.xColumn},'%Y')
+        </if>
+    </select>
+
+    <select id="selectGroup" resultType="map" >
+        SELECT ${params.column} , count(1) total FROM kechengchengji
+        <where> 1=1 ${ew.sqlSegment}</where>
+        group by ${params.column}
+        limit 10
+    </select>
+
+    <select id="kechengmingchengkechengchengjiSectionStat" resultType="map" >
+        select
+        kechengmingcheng,
+        sum(case when kechengchengji &lt;= 60 then 1 else 0 end) as 不及格,        sum(case when kechengchengji >= 61 and kechengchengji &lt;= 80 then 1 else 0 end) as 良,        sum(case when kechengchengji >= 81 then 1 else 0 end) as 优        from kechengchengji
+        <where> 1=1 ${ew.sqlSegment}</where>
+        group by kechengmingcheng
+    </select>
+
+
+</mapper>
